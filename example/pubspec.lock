@@ -50,13 +50,6 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -84,12 +77,12 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_control:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_control
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.98.85+3"
+    version: "1.0.0-pre15.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter

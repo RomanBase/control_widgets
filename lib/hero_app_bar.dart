@@ -1,9 +1,10 @@
 part of widgets;
 
-Curve _showActionCurve = Curves.linear.from(0.875);
-Curve _hideActionCurve = Curves.linear.from(0.95);
-Curve _showTitleCurve = Curves.linear.from(0.875);
-Curve _hideTitleCurve = Curves.linear.from(0.95);
+Curve _actionInCurve = Curves.linear.to(0.125);
+Curve _actionOutCurve = Curves.linear.from(0.875);
+
+Curve _titleInCurve = Curves.linear.to(0.5);
+Curve _titleOutCurve = Curves.linear.from(0.5);
 
 const _defaultHeroTag = HeroAppBar;
 
@@ -12,7 +13,7 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool primary;
   final Color backgroundColor;
   final double elevation;
-  final double height;
+  final double toolbarHeight;
   final Color shadowColor;
   final ShapeBorder shape;
   final Widget leading;
@@ -27,7 +28,7 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.primary: true,
     this.backgroundColor,
     this.elevation: 0.0,
-    this.height: kToolbarHeight,
+    this.toolbarHeight: kToolbarHeight,
     this.shadowColor,
     this.shape,
     this.leading,
@@ -38,7 +39,7 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
   }) : super(key: key);
 
   @override
-  Size get preferredSize => Size.fromHeight(height + (bottom?.preferredSize?.height ?? 0.0));
+  Size get preferredSize => Size.fromHeight(toolbarHeight + (bottom?.preferredSize?.height ?? 0.0));
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +51,8 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () => Navigator.of(context).pop(),
               ));
 
+    final appBar = buildAppBar(leading: leadingWidget);
+
     return Hero(
       tag: heroTag,
       transitionOnUserGestures: true,
@@ -58,140 +61,82 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
 
         final push = flightDirection == HeroFlightDirection.push;
 
-        return push ? pushTransition(animation, fromBar, leadingWidget) : popTransition(animation, fromBar, leadingWidget);
+        return push ? barTransition(animation, fromBar, appBar) : barTransition(animation, appBar, fromBar);
       },
-      child: buildAppBar(
-        title: title,
-        color: backgroundColor,
-        leading: leadingWidget,
-        actions: actions,
-        bottom: bottom,
-      ),
+      child: appBar,
     );
   }
 
-  Widget pushTransition(Animation animation, AppBar fromBar, Widget leading) {
+  T _byProgress<T>(double progress, T a, T b) => progress < 0.5 ? a : b;
+
+  Widget barTransition(Animation animation, AppBar firstBar, AppBar secondBar) {
     return AnimatedBuilder(
-        animation: animation,
-        builder: (context, child) {
-          final progress = animation.value;
+      animation: animation,
+      builder: (context, child) {
+        final progress = animation.value;
 
-          return buildAppBar(
-            color: Color.lerp(fromBar.backgroundColor, backgroundColor, progress),
-            title: Stack(
-              alignment: centerTitle ? Alignment.center : Alignment.centerLeft,
-              children: [
-                Opacity(
-                  opacity: 1.0 - progress,
-                  child: SlideTransition(
-                    position: Tween(begin: Offset.zero, end: Offset(-1.0, 0.0)).animate(animation),
-                    child: fromBar.title,
-                  ),
-                ),
-                Opacity(
-                  opacity: progress,
-                  child: SlideTransition(
-                    position: Tween(begin: Offset(1.0, 0.0), end: Offset.zero).animate(animation),
-                    child: title,
-                  ),
-                ),
-              ],
+        return buildAppBar(
+          primary: _byProgress(progress, firstBar.primary, secondBar.primary),
+          toolbarHeight: ui.lerpDouble(firstBar.toolbarHeight, secondBar.toolbarHeight, progress),
+          //shape: ShapeBorder.lerp(firstBar.shape, secondBar.shape, progress),
+          //elevation: ui.lerpDouble(firstBar.elevation, secondBar.elevation, progress),
+          backgroundColor: Color.lerp(firstBar.backgroundColor, secondBar.backgroundColor, progress),
+          centerTitle: _byProgress(progress, firstBar.centerTitle, secondBar.centerTitle),
+          title: _byProgress(
+            progress,
+            Opacity(
+              opacity: 1.0 - _titleInCurve.transform(progress),
+              child: SlideTransition(
+                position: Tween(begin: Offset.zero, end: Offset(-1.0, 0.0)).animate(animation),
+                child: firstBar.title,
+              ),
             ),
-            leading: progress > 0.5
-                ? (leading == null
-                    ? null
-                    : Opacity(
-                        opacity: _showActionCurve.transform(progress),
-                        child: leading,
-                      ))
-                : (fromBar.leading == null
-                    ? null
-                    : Opacity(
-                        opacity: _hideActionCurve.transform(1.0 - progress),
-                        child: fromBar.leading,
-                      )),
-            actions: progress > 0.5
-                ? actions
-                    ?.map((item) => Opacity(
-                          opacity: _showActionCurve.transform(progress),
-                          child: item,
-                        ))
-                    ?.toList()
-                : fromBar.actions
-                    ?.map((item) => Opacity(
-                          opacity: _hideActionCurve.transform(1.0 - progress),
-                          child: item,
-                        ))
-                    ?.toList(),
-            bottom: buildBottom(
-              animation,
-              bottom,
-              fromBar.bottom,
+            Opacity(
+              opacity: _titleOutCurve.transform(progress),
+              child: SlideTransition(
+                position: Tween(begin: Offset(1.0, 0.0), end: Offset.zero).animate(animation),
+                child: secondBar.title,
+              ),
             ),
-          );
-        });
-  }
-
-  Widget popTransition(Animation animation, AppBar fromBar, Widget leading) {
-    return AnimatedBuilder(
-        animation: animation,
-        builder: (context, child) {
-          final progress = animation.value;
-
-          return buildAppBar(
-            color: Color.lerp(fromBar.backgroundColor, backgroundColor, 1.0 - progress),
-            title: Stack(
-              alignment: centerTitle ? Alignment.center : Alignment.centerLeft,
-              children: [
-                Opacity(
-                  opacity: 1.0 - progress,
-                  child: SlideTransition(
-                    position: Tween(begin: Offset.zero, end: Offset(-1.0, 0.0)).animate(animation),
-                    child: title,
-                  ),
-                ),
-                Opacity(
-                  opacity: progress,
-                  child: SlideTransition(
-                    position: Tween(begin: Offset(1.0, 0.0), end: Offset.zero).animate(animation),
-                    child: fromBar.title,
-                  ),
-                ),
-              ],
-            ),
-            leading: progress > 0.5
-                ? (fromBar.leading == null
-                    ? null
-                    : Opacity(
-                        opacity: _hideActionCurve.transform(progress),
-                        child: fromBar.leading,
-                      ))
-                : (leading == null
-                    ? null
-                    : Opacity(
-                        opacity: _showActionCurve.transform(1.0 - progress),
-                        child: leading,
-                      )),
-            actions: progress > 0.5
-                ? fromBar.actions
-                    ?.map((item) => Opacity(
-                          opacity: _hideActionCurve.transform(progress),
-                          child: item,
-                        ))
-                    ?.toList()
-                : actions
-                    ?.map((item) => Opacity(
-                          opacity: _showActionCurve.transform(1.0 - progress),
-                          child: item,
-                        ))
-                    ?.toList(),
-            bottom: buildBottom(
-              animation,
-              fromBar.bottom,
-              bottom,
-            ),
-          );
-        });
+          ),
+          leading: _byProgress(
+            progress,
+            (firstBar.leading == null
+                ? null
+                : Opacity(
+                    opacity: 1.0 - _actionInCurve.transform(progress),
+                    child: firstBar.leading,
+                  )),
+            (secondBar.leading == null
+                ? null
+                : Opacity(
+                    opacity: _actionOutCurve.transform(progress),
+                    child: secondBar.leading,
+                  )),
+          ),
+          actions: _byProgress(
+            progress,
+            firstBar.actions
+                ?.map((item) => Opacity(
+                      opacity: 1.0 - _actionInCurve.transform(progress),
+                      child: item,
+                    ))
+                ?.toList(),
+            secondBar.actions
+                ?.map((item) => Opacity(
+                      opacity: _actionOutCurve.transform(progress),
+                      child: item,
+                    ))
+                ?.toList(),
+          ),
+          bottom: buildBottom(
+            animation,
+            firstBar.bottom,
+            secondBar.bottom,
+          ),
+        );
+      },
+    );
   }
 
   PreferredSizeWidget buildBottom(Animation animation, PreferredSizeWidget firstWidget, PreferredSizeWidget secondWidget) {
@@ -204,37 +149,45 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
     final secondSize = secondWidget?.preferredSize ?? Size.zero;
 
     return PreferredSize(
-      child: progress > 0.5
-          ? Opacity(
-              opacity: _hideActionCurve.transform(progress),
-              child: firstWidget,
-            )
-          : Opacity(
-              opacity: _showActionCurve.transform(1.0 - progress),
-              child: secondWidget,
-            ),
+      child: _byProgress(
+        progress,
+        Opacity(
+          opacity: _actionInCurve.transform(progress),
+          child: firstWidget,
+        ),
+        Opacity(
+          opacity: _actionOutCurve.transform(progress),
+          child: secondWidget,
+        ),
+      ),
       preferredSize: Size.lerp(firstSize, secondSize, animation.value),
     );
   }
 
   Widget buildAppBar({
-    @required Widget title,
-    @required Color color,
+    bool primary,
+    double toolbarHeight,
+    ShapeBorder shape,
+    double elevation,
+    Color shadowColor,
+    Color backgroundColor,
     Widget leading,
+    Widget title,
+    bool centerTitle,
     List<Widget> actions,
     PreferredSizeWidget bottom,
   }) =>
       AppBar(
-        primary: primary,
-        toolbarHeight: height,
-        shape: shape,
-        elevation: elevation,
-        shadowColor: shadowColor,
-        backgroundColor: color,
-        leading: leading,
-        title: title,
-        centerTitle: centerTitle,
-        actions: actions,
-        bottom: bottom,
+        primary: primary ?? this.primary,
+        toolbarHeight: toolbarHeight ?? this.toolbarHeight,
+        shape: shape ?? this.shape,
+        elevation: elevation ?? this.elevation,
+        shadowColor: shadowColor ?? this.shadowColor,
+        backgroundColor: backgroundColor ?? this.backgroundColor,
+        leading: leading ?? this.leading,
+        title: title ?? this.title,
+        centerTitle: centerTitle ?? this.centerTitle,
+        actions: actions ?? this.actions,
+        bottom: bottom ?? this.bottom,
       );
 }
