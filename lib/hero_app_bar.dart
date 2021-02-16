@@ -121,13 +121,13 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
                       opacity: 1.0 - _actionInCurve.transform(progress),
                       child: item,
                     ))
-                ?.toList(),
+                ?.toList() ?? Container(),
             secondBar.actions
                 ?.map((item) => Opacity(
                       opacity: _actionOutCurve.transform(progress),
                       child: item,
                     ))
-                ?.toList(),
+                ?.toList() ?? Container(),
           ),
           bottom: buildBottom(
             animation,

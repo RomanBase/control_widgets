@@ -41,7 +41,7 @@ class CustomHeaderPage extends ControlWidget with ThemeProvider, ControlsCompone
                   shape: RoundedConvexBorder(radius: 32.0),
                   centerTitle: false,
                   primary: false,
-                  title:SizedBox(
+                  title: SizedBox(
                     height: barHeight,
                     child: Stack(
                       children: [
@@ -149,10 +149,11 @@ class CustomHeaderDetailPage extends ControlWidget with RouteControl {
         centerTitle: true,
         title: Text('title of the detail'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage())),
-          ),
+          if (Random().nextBool())
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage())),
+            ),
         ],
       ),
     );
