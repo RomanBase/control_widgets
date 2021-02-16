@@ -1,3 +1,4 @@
+import 'package:control_widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_control/core.dart';
 
@@ -16,8 +17,14 @@ class MyApp extends StatelessWidget {
       ],
       app: (setup, home) => MaterialApp(
         key: setup.key,
-        home: home,
         theme: setup.theme,
+        onGenerateRoute: (settings) => ModalCardRoute(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            child: home,
+          ),
+          settings: settings,
+        ),
       ),
     );
   }

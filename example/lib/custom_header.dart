@@ -35,6 +35,7 @@ class CustomHeaderPage extends ControlWidget with ThemeProvider, ControlsCompone
               return SizedBox(
                 height: barHeight,
                 child: HeroAppBar(
+                  heroTag: 'slide',
                   toolbarHeight: barHeight,
                   backgroundColor: theme.accentColor,
                   elevation: 0.0,
@@ -110,7 +111,7 @@ class CustomHeaderPage extends ControlWidget with ThemeProvider, ControlsCompone
                         padding: EdgeInsets.only(top: device.topBorderSize + theme.paddingQuad),
                         child: IconButton(
                           icon: Icon(Icons.settings_outlined),
-                          onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage())),
+                          onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage('slide'))),
                         ),
                       ),
                     ),
@@ -123,12 +124,20 @@ class CustomHeaderPage extends ControlWidget with ThemeProvider, ControlsCompone
         body: Column(
           children: [
             ...List.filled(
-                30,
-                Container(
-                  height: 96.0,
-                  margin: EdgeInsets.symmetric(horizontal: theme.padding, vertical: theme.paddingHalf),
-                  color: Color.fromARGB(255, Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)),
-                )),
+              30,
+              Container(
+                height: 96.0,
+                margin: EdgeInsets.symmetric(horizontal: theme.padding, vertical: theme.paddingHalf),
+                color: Color.fromARGB(255, Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)),
+                child: FlatButton(
+                  onPressed: () => openRoute(ModalCardRoute(
+                      builder: (_) => InnerNavigator.card(
+                            builder: (context) => CustomHeaderDetailPage('slide_on_card'),
+                          ))),
+                  child: Container(),
+                ),
+              ),
+            ),
             SizedBox(
               height: theme.paddingHalf,
             ),
@@ -140,22 +149,36 @@ class CustomHeaderPage extends ControlWidget with ThemeProvider, ControlsCompone
 }
 
 class CustomHeaderDetailPage extends ControlWidget with RouteControl {
+  final Object heroTag;
+
+  CustomHeaderDetailPage(this.heroTag);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: HeroAppBar(
+        heroTag: this.heroTag,
         backgroundColor: Colors.red,
         elevation: 6.0,
         centerTitle: true,
         title: Text('title of the detail'),
-        actions: Random().nextBool()
-            ? [
-                IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage())),
-                ),
-              ]
-            : null,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage(heroTag))),
+          ),
+        ],
+      ),
+      body: Center(
+        child: Container(
+          height: 96.0,
+          color: Color.fromARGB(255, Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)),
+          margin: EdgeInsets.symmetric(horizontal: 96.0),
+          child: FlatButton(
+            onPressed: () => openRoute(ModalCardRoute(builder: (_) => CustomHeaderDetailPage('card'))),
+            child: Container(),
+          ),
+        ),
       ),
     );
   }
