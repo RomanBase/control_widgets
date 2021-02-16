@@ -23,7 +23,7 @@ class ModalCardRoute<T> extends PageRoute<T> with CupertinoRouteTransitionMixin 
   final bool maintainState = true;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 700);
+  Duration get transitionDuration => const Duration(milliseconds: 300);
 
   @override
   Color get barrierColor => null;
