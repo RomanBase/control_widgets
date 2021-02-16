@@ -148,13 +148,14 @@ class CustomHeaderDetailPage extends ControlWidget with RouteControl {
         elevation: 6.0,
         centerTitle: true,
         title: Text('title of the detail'),
-        actions: [
-          if (Random().nextBool())
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage())),
-            ),
-        ],
+        actions: Random().nextBool()
+            ? [
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage())),
+                ),
+              ]
+            : null,
       ),
     );
   }
