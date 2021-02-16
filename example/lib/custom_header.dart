@@ -131,7 +131,7 @@ class CustomHeaderPage extends ControlWidget with ThemeProvider, ControlsCompone
                 color: Color.fromARGB(255, Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)),
                 child: FlatButton(
                   onPressed: () => openRoute(ModalCardRoute(
-                      builder: (_) => InnerNavigator.card(
+                      builder: (_) => InnerNavigator.cupertino(
                             builder: (context) => CustomHeaderDetailPage('slide_on_card'),
                           ))),
                   child: Container(),
