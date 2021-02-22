@@ -4,15 +4,12 @@ class ModalCardRoute<T> extends PageRoute<T> with CupertinoRouteTransitionMixin 
   /// Builds the primary contents of the route.
   final WidgetBuilder builder;
 
-  final bool root;
-
   TransitionRoute _prevRoute;
   TransitionRoute _nextRoute;
 
   ModalCardRoute({
     @required this.builder,
     RouteSettings settings,
-    this.root: false,
   })  : assert(builder != null),
         super(settings: settings, fullscreenDialog: false);
 
@@ -71,7 +68,7 @@ class ModalCardRoute<T> extends PageRoute<T> with CupertinoRouteTransitionMixin 
     }
 
     return _ModalPageStackTransition(
-      level: (this.isFirst || root) ? 0.0 : 1.0,
+      level: this.isFirst ? 0.0 : 1.0,
       primaryRouteAnimation: animation,
       secondaryRouteAnimation: secondaryAnimation,
       linearTransition: CupertinoRouteTransitionMixin.isPopGestureInProgress(this),
@@ -163,20 +160,34 @@ class _ModalPageStackTransition extends StatelessWidget {
     final parentScale = ((topBorder * outAnim.value) * 2.0 / device.height) * (1.0 - math.min(level, 1.0));
     final childPadding = topBorder * math.min(level, 1.0) + 8.0 * level;
 
-    return Container(
-      child: ScaleTransition(
-        scale: Tween(begin: 1.0, end: 1.0 - parentScale).animate(outAnim),
-        child: Padding(
-          padding: EdgeInsets.only(top: childPadding),
-          child: SlideTransition(
-            position: Tween(begin: Offset(0.0, 1.0), end: Offset.zero).animate(inAnim),
-            child: ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
-              child: child,
+    return Stack(
+      children: [
+        Container(
+          child: ScaleTransition(
+            scale: Tween(begin: 1.0, end: 1.0 - parentScale).animate(outAnim),
+            child: Padding(
+              padding: EdgeInsets.only(top: childPadding),
+              child: SlideTransition(
+                position: Tween(begin: Offset(0.0, 1.0), end: Offset.zero).animate(inAnim),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
+                  child: child,
+                ),
+              ),
             ),
           ),
         ),
-      ),
+        if (level == 0.0)
+          IgnorePointer(
+            ignoring: true,
+            child: Opacity(
+              opacity: outAnim.value,
+              child: Container(
+                color: Colors.black54,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -359,8 +370,8 @@ class _ModalBackGestureDetectorState<T> extends State<_ModalBackGestureDetector<
             }
           } else if (notification is ScrollEndNotification) {
             _handleDragEnd(notification.dragDetails);
-          } else if(notification is ScrollUpdateNotification){
-            if(_backGestureController != null && notification.dragDetails != null){
+          } else if (notification is ScrollUpdateNotification) {
+            if (_backGestureController != null && notification.dragDetails != null) {
               _handleDragUpdate(notification.dragDetails);
             }
           }
