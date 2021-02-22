@@ -148,7 +148,7 @@ class CustomHeaderPage extends ControlWidget with ThemeProvider, ControlsCompone
   }
 }
 
-class CustomHeaderDetailPage extends ControlWidget with RouteControl {
+class CustomHeaderDetailPage extends ControlWidget with RouteControl, ThemeProvider {
   final Object heroTag;
 
   CustomHeaderDetailPage(this.heroTag);
@@ -163,21 +163,38 @@ class CustomHeaderDetailPage extends ControlWidget with RouteControl {
         centerTitle: true,
         title: Text('title of the detail'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () => openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage(heroTag))),
-          ),
+          Builder(builder: (context) {
+            return IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                openRoute(CupertinoPageRoute(builder: (context) => CustomHeaderDetailPage(heroTag)));
+              },
+            );
+          }),
         ],
       ),
-      body: Center(
-        child: Container(
-          height: 96.0,
-          color: Color.fromARGB(255, Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)),
-          margin: EdgeInsets.symmetric(horizontal: 96.0),
-          child: FlatButton(
-            onPressed: () => openRoute(ModalCardRoute(builder: (_) => CustomHeaderDetailPage('card'))),
-            child: Container(),
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ...List.filled(
+              30,
+              Container(
+                height: 96.0,
+                margin: EdgeInsets.symmetric(horizontal: theme.padding, vertical: theme.paddingHalf),
+                color: Color.fromARGB(255, Random().nextInt(255), Random().nextInt(255), Random().nextInt(255)),
+                child: FlatButton(
+                  onPressed: () => openRoute(ModalCardRoute(
+                      builder: (_) => InnerNavigator.cupertino(
+                            builder: (context) => CustomHeaderDetailPage('slide_on_card'),
+                          ))),
+                  child: Container(),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: theme.paddingHalf,
+            ),
+          ],
         ),
       ),
     );

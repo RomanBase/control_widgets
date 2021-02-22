@@ -306,24 +306,6 @@ class _ModalBackGestureDetector<T> extends StatefulWidget {
 class _ModalBackGestureDetectorState<T> extends State<_ModalBackGestureDetector<T>> {
   _VerticalBackGestureController<T> _backGestureController;
 
-  VerticalDragGestureRecognizer _recognizer;
-
-  @override
-  void initState() {
-    super.initState();
-    _recognizer = VerticalDragGestureRecognizer(debugOwner: this)
-      ..onStart = _handleDragStart
-      ..onUpdate = _handleDragUpdate
-      ..onEnd = _handleDragEnd
-      ..onCancel = _handleDragCancel;
-  }
-
-  @override
-  void dispose() {
-    _recognizer.dispose();
-    super.dispose();
-  }
-
   void _handleDragStart(DragStartDetails details) {
     assert(mounted);
     assert(_backGestureController == null);
@@ -333,13 +315,16 @@ class _ModalBackGestureDetectorState<T> extends State<_ModalBackGestureDetector<
   void _handleDragUpdate(DragUpdateDetails details) {
     assert(mounted);
     assert(_backGestureController != null);
+
     _backGestureController.dragUpdate(details.primaryDelta / context.size.height);
   }
 
   void _handleDragEnd(DragEndDetails details) {
     assert(mounted);
-    assert(_backGestureController != null);
-    _backGestureController.dragEnd(details.velocity.pixelsPerSecond.dx / context.size.height);
+
+    final velocity = details?.velocity?.pixelsPerSecond?.dx ?? 0.0;
+
+    _backGestureController?.dragEnd(velocity / context.size.height);
     _backGestureController = null;
   }
 
@@ -351,30 +336,38 @@ class _ModalBackGestureDetectorState<T> extends State<_ModalBackGestureDetector<
     _backGestureController = null;
   }
 
-  void _handlePointerDown(PointerDownEvent event) {
-    if (widget.enabledCallback()) _recognizer.addPointer(event);
-  }
-
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasDirectionality(context));
     // For devices with notches, the drag area needs to be larger on the side
     // that has the notch.
-    return Stack(
-      fit: StackFit.passthrough,
-      children: <Widget>[
-        widget.child,
-        PositionedDirectional(
-          start: 0.0,
-          width: Device.of(context).width,
-          top: 0.0,
-          bottom: 0.0,
-          child: Listener(
-            onPointerDown: _handlePointerDown,
-            behavior: HitTestBehavior.translucent,
-          ),
-        ),
-      ],
+
+    return GestureDetector(
+      excludeFromSemantics: true,
+      onVerticalDragStart: _handleDragStart,
+      onVerticalDragUpdate: _handleDragUpdate,
+      onVerticalDragEnd: _handleDragEnd,
+      onVerticalDragCancel: _handleDragCancel,
+      child: NotificationListener(
+        child: widget.child,
+        onNotification: (notification) {
+          if (notification is OverscrollNotification && notification.overscroll < 0.0) {
+            if (_backGestureController == null) {
+              _handleDragStart(null);
+            } else if (notification.dragDetails != null) {
+              _handleDragUpdate(notification.dragDetails);
+            }
+          } else if (notification is ScrollEndNotification) {
+            _handleDragEnd(notification.dragDetails);
+          } else if(notification is ScrollUpdateNotification){
+            if(_backGestureController != null && notification.dragDetails != null){
+              _handleDragUpdate(notification.dragDetails);
+            }
+          }
+
+          return false;
+        },
+      ),
     );
   }
 }
