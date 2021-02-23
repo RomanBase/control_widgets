@@ -2,6 +2,7 @@
   <dictionary name="Base">
     <words>
       <w>cupertino</w>
+      <w>overscroll</w>
       <w>tabbar</w>
     </words>
   </dictionary>

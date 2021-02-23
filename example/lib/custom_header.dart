@@ -174,6 +174,7 @@ class CustomHeaderDetailPage extends ControlWidget with RouteControl, ThemeProvi
         ],
       ),
       body: SingleChildScrollView(
+        physics: BouncingLockPhysics(),
         child: Column(
           children: [
             ...List.filled(

@@ -325,9 +325,8 @@ class _ModalBackGestureDetectorState<T> extends State<_ModalBackGestureDetector<
 
   void _handleDragUpdate(DragUpdateDetails details) {
     assert(mounted);
-    assert(_backGestureController != null);
 
-    _backGestureController.dragUpdate(details.primaryDelta / context.size.height);
+    _backGestureController?.dragUpdate(details.primaryDelta / context.size.height);
   }
 
   void _handleDragEnd(DragEndDetails details) {
@@ -362,6 +361,10 @@ class _ModalBackGestureDetectorState<T> extends State<_ModalBackGestureDetector<
       child: NotificationListener(
         child: widget.child,
         onNotification: (notification) {
+          if (notification is OverscrollIndicatorNotification) {
+            notification.disallowGlow();
+          }
+
           if (notification is OverscrollNotification && notification.overscroll < 0.0) {
             if (_backGestureController == null) {
               _handleDragStart(null);
