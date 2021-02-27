@@ -11,6 +11,7 @@ const _defaultHeroTag = HeroAppBar;
 class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Object heroTag;
   final bool primary;
+  final Brightness brightness;
   final Color backgroundColor;
   final double elevation;
   final double toolbarHeight;
@@ -26,6 +27,7 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
     Key key,
     this.heroTag: _defaultHeroTag,
     this.primary: true,
+    this.brightness,
     this.backgroundColor,
     this.elevation: 0.0,
     this.toolbarHeight: kToolbarHeight,
@@ -179,6 +181,7 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
   }) =>
       AppBar(
         primary: primary ?? this.primary,
+        brightness: brightness,
         toolbarHeight: toolbarHeight ?? this.toolbarHeight,
         shape: shape ?? this.shape,
         elevation: elevation ?? this.elevation,
