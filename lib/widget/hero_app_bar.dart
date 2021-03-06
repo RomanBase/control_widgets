@@ -60,10 +60,11 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
       transitionOnUserGestures: true,
       flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
         AppBar fromBar = (fromHeroContext.widget as Hero).child as AppBar;
+        AppBar toBar = (toHeroContext.widget as Hero).child as AppBar;
 
         final push = flightDirection == HeroFlightDirection.push;
 
-        return push ? barTransition(animation, fromBar, appBar) : barTransition(animation, appBar, fromBar);
+        return push ? barTransition(animation, fromBar, toBar) : barTransition(animation, toBar, fromBar);
       },
       child: appBar,
     );
@@ -80,7 +81,7 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
         return buildAppBar(
           primary: _byProgress(progress, firstBar.primary, secondBar.primary),
           toolbarHeight: ui.lerpDouble(firstBar.toolbarHeight, secondBar.toolbarHeight, progress),
-          //shape: ShapeBorder.lerp(firstBar.shape, secondBar.shape, progress),
+          shape: _byProgress(progress, firstBar.shape, secondBar.shape),
           //elevation: ui.lerpDouble(firstBar.elevation, secondBar.elevation, progress),
           backgroundColor: Color.lerp(firstBar.backgroundColor, secondBar.backgroundColor, progress),
           centerTitle: _byProgress(progress, firstBar.centerTitle, secondBar.centerTitle),

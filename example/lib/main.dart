@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ControlRoot(
+      initState: AppState.main,
       states: [
         AppState.main.build((context) => CustomHeaderPage()),
       ],
