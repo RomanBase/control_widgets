@@ -72,14 +72,16 @@ class ModalCardRoute<T> extends PageRoute<T> with CupertinoRouteTransitionMixin 
       primaryRouteAnimation: animation,
       secondaryRouteAnimation: secondaryAnimation,
       linearTransition: CupertinoRouteTransitionMixin.isPopGestureInProgress(this),
-      child: _ModalBackGestureDetector<T>(
-        enabledCallback: () => popGestureEnabled,
-        onStartPopGesture: () => _VerticalBackGestureController<T>(
-          navigator: navigator,
-          controller: controller,
-        ),
-        child: child,
-      ),
+      child: this.isFirst
+          ? child
+          : _ModalBackGestureDetector<T>(
+              enabledCallback: () => popGestureEnabled,
+              onStartPopGesture: () => _VerticalBackGestureController<T>(
+                navigator: navigator,
+                controller: controller,
+              ),
+              child: child,
+            ),
     );
   }
 
