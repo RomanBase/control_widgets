@@ -22,6 +22,9 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool centerTitle;
   final List<Widget> actions;
   final PreferredSizeWidget bottom;
+  final IconThemeData iconTheme;
+  final IconThemeData actionsIconTheme;
+  final double leadingWidth;
 
   const HeroAppBar({
     Key key,
@@ -38,6 +41,9 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.centerTitle: false,
     this.actions,
     this.bottom,
+    this.iconTheme,
+    this.actionsIconTheme,
+    this.leadingWidth,
   }) : super(key: key);
 
   @override
@@ -193,5 +199,8 @@ class HeroAppBar extends StatelessWidget implements PreferredSizeWidget {
         centerTitle: centerTitle ?? this.centerTitle,
         actions: actions ?? this.actions,
         bottom: bottom ?? this.bottom,
+        iconTheme: iconTheme,
+        actionsIconTheme: actionsIconTheme,
+        leadingWidth: leadingWidth,
       );
 }
