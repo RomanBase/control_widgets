@@ -267,7 +267,7 @@ class _StickyScrollViewState extends State<StickyScrollView> {
         if (widget.background != null) widget.background,
         // Header
         if (widget.headerBackground != null)
-          ActionBuilderGroup(
+          ControlBuilderGroup(
             controls: [control.scrollOffset, control.stickRatio, control.scrollPosition],
             builder: (context, value) {
               return Transform.translate(
@@ -293,7 +293,7 @@ class _StickyScrollViewState extends State<StickyScrollView> {
         ),
         // Header
         if (widget.header != null)
-          ActionBuilderGroup(
+          ControlBuilderGroup(
             controls: [control.scrollOffset, control.stickRatio],
             builder: (context, value) {
               return Opacity(
@@ -316,7 +316,7 @@ class _StickyScrollViewState extends State<StickyScrollView> {
           ),
         // TabBar
         if (widget.tabBar != null)
-          ActionBuilder<double>(
+          ControlBuilder<double>(
             control: control.scrollOffset,
             builder: (context, value) {
               return Transform.translate(
@@ -334,7 +334,7 @@ class _StickyScrollViewState extends State<StickyScrollView> {
           SizedBox(
             width: widget.appBar.preferredSize.width,
             height: widget.appBar.preferredSize.height,
-            child: ActionBuilder<double>(
+            child: ControlBuilder<double>(
               control: control.stickRatio,
               builder: (context, ratio) {
                 return Opacity(

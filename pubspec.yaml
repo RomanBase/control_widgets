@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_control: any
+  flutter_control: ">=2.0.0"
 
 dev_dependencies:
   flutter_test:
